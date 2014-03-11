@@ -87,6 +87,7 @@ PHP_INI_END();
 
 /** {{{ PHP_GINIT_FUNCTION
 */
+//GINIT=global init ,全局变量初始化。
 PHP_GINIT_FUNCTION(yaf)
 {
 	yaf_globals->autoload_started   = 0;
