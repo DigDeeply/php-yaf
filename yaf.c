@@ -65,6 +65,7 @@ PHP_INI_MH(OnUpdateSeparator) {
 
 /** {{{ PHP_INI
  */
+//初始化ini配置文件，在MINIT中加载
 PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("yaf.library",         	"",  PHP_INI_ALL, OnUpdateString, global_library, zend_yaf_globals, yaf_globals)
 	STD_PHP_INI_BOOLEAN("yaf.action_prefer",   	"0", PHP_INI_ALL, OnUpdateBool, action_prefer, zend_yaf_globals, yaf_globals)
