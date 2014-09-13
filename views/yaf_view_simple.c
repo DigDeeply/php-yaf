@@ -413,12 +413,14 @@ int yaf_view_simple_display(yaf_view_t *view, zval *tpl, zval *vars, zval *ret T
 	ALLOC_HASHTABLE(EG(active_symbol_table));
 	zend_hash_init(EG(active_symbol_table), 0, NULL, ZVAL_PTR_DTOR, 0);
 
+	//把函数的参数变量导入该类的私有变量
 	(void)yaf_view_simple_extract(tpl_vars, vars TSRMLS_CC);
 
 	old_scope = EG(scope);
 	EG(scope) = yaf_view_simple_ce;
 
 #if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION < 4))
+	//判断short_tags
 	short_open_tag = CG(short_tags);
 	{
 		zval **short_tag;
@@ -426,14 +428,16 @@ int yaf_view_simple_display(yaf_view_t *view, zval *tpl, zval *vars, zval *ret T
 		if (IS_ARRAY != Z_TYPE_P(options)
 				|| (zend_hash_find(Z_ARRVAL_P(options), ZEND_STRS("short_tag"), (void **)&short_tag) == FAILURE)
 				|| zend_is_true(*short_tag)) {
-			CG(short_tags) = 1;
+			CG(short_tags) = 1;	//set 1,关闭short_tags
 		}
 	}
 #endif
 
 	if (IS_ABSOLUTE_PATH(Z_STRVAL_P(tpl), Z_STRLEN_P(tpl))) {
+		//如果模版路径是绝对路径
 		script 	= Z_STRVAL_P(tpl);
 		len 	= Z_STRLEN_P(tpl);
+		//模版存在，就导入
 		if (yaf_loader_import(script, len + 1, 0 TSRMLS_CC) == 0) {
 			yaf_trigger_error(YAF_ERR_NOTFOUND_VIEW TSRMLS_CC, "Failed opening template %s: %s" , script, strerror(errno));
 #if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION < 4))
@@ -448,6 +452,7 @@ int yaf_view_simple_display(yaf_view_t *view, zval *tpl, zval *vars, zval *ret T
 			return 0;
 		}
 	} else {
+		//莫把那不是绝对路径，转化出绝对路径。
 		zval *tpl_dir = zend_read_property(yaf_view_simple_ce, view, ZEND_STRL(YAF_VIEW_PROPERTY_NAME_TPLDIR), 0 TSRMLS_CC);
 
 		if (IS_STRING != Z_TYPE_P(tpl_dir)) {
